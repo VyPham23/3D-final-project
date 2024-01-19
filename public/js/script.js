@@ -46,18 +46,6 @@ function createScene() {
 	nearPlane = 1;
 	farPlane = 4000;
 
-
-	//Build Camera
-
-	// camera = new THREE.PerspectiveCamera(
-	// 	fieldOfView,
-	// 	aspectRatio,
-	// 	nearPlane,
-	// 	farPlane
-	// 	);
-
-	// camera.position.set(0,30,100);
-
 	renderer = new THREE.WebGLRenderer({ 
 		alpha: true, 
 		antialias: true 
@@ -1310,6 +1298,105 @@ function loop(){
 	flapWings();
 
 	requestAnimationFrame(loop);
-	// update();
+	update();
+}
+
+function update (){
+
+	var delta = clock.getDelta(); // seconds.
+
+	//Boat Movement
+	var rotateAngle = Math.PI / 3.5 * delta; 
+	var propellorAngle = -Math.PI * 4 * delta;   // degrees per second
+	var moveDistance = 100 * delta; // 100 pixels per second
+
+	//Sea Gull Island Movement	
+
+	for (var i = 0; i <seaGullIslandArray.length; i++){
+
+		var turningCircle = -Math.PI /6 * delta;
+		var speed = 40 * delta;
+
+		seaGullIslandArray[i].mesh.translateZ(-speed) ;
+		seaGullIslandArray[i].mesh.rotateOnAxis( new THREE.Vector3(0,1,0), turningCircle);
+	}
+
+	//Sea Gull Free Movement	
+
+	seaGull.mesh.translateZ(-(speed+.35)) ;
+	seaGull.mesh.rotateOnAxis( new THREE.Vector3(0,1,0), Math.PI /15 * delta);
+
+	//console.log(boat.mesh.position);
+
+	//Engine Idle
+	boat.propellor.rotateOnAxis( new THREE.Vector3(0,1,0), propellorAngle/8);
+
+	//Engine Rotation
+	var engineY = boat.engineBlock.rotation.y;
+	var maxEngineY = .8;
+
+	// if ( ! (keyboard.pressed("W") || keyboard.pressed("S"))) {
+	// boat.engineBlock.rotation.z = Math.sin(Date.now() * 0.05) * Math.PI * 0.005 ;
+	// }
+
+	if ( keyboard.pressed("W") ) {
+		boat.mesh.translateZ( -moveDistance );
+
+		boat.propellor.rotateOnAxis( new THREE.Vector3(0,1,0), propellorAngle);
+	}	
+
+	if ( keyboard.pressed("S") ) {
+		boat.mesh.translateZ(  moveDistance );
+
+		boat.propellor.rotateOnAxis( new THREE.Vector3(0,1,0), -propellorAngle);		
+	}
+
+	if ( keyboard.pressed("A") ) {
+		setTimeout(function(){
+			boat.mesh.rotateOnAxis( new THREE.Vector3(0,1,0), rotateAngle);
+		}, 100);
+
+		if (keyboard.pressed("S")) {
+			boat.engineBlock.rotation.y = THREE.Math.clamp(engineY + (delta*2.5), -maxEngineY, maxEngineY);
+		} else {
+			boat.engineBlock.rotation.y = THREE.Math.clamp(engineY - (delta*2.5), -maxEngineY, maxEngineY);	
+		}
+
+		if ( ! (keyboard.pressed("W") || keyboard.pressed("S"))) {
+			boat.propellor.rotateOnAxis( new THREE.Vector3(0,1,0), propellorAngle);
+		}
+	}
+
+	if ( keyboard.pressed("D") ){
+		setTimeout(function(){
+			boat.mesh.rotateOnAxis( new THREE.Vector3(0,1,0), -rotateAngle);
+		}, 100);
+
+		if (keyboard.pressed("S")) {
+			boat.engineBlock.rotation.y = THREE.Math.clamp(engineY - (delta*2.5), -maxEngineY, maxEngineY);
+		} else {
+			boat.engineBlock.rotation.y = THREE.Math.clamp(engineY + (delta*2.5), -maxEngineY, maxEngineY);
+		}
+
+
+		if ( ! (keyboard.pressed("W") || keyboard.pressed("S"))) {
+			boat.propellor.rotateOnAxis( new THREE.Vector3(0,1,0), propellorAngle);
+		}
+	}
+
+	// Steering Decay
+
+	if ( ! ( keyboard.pressed("A") || keyboard.pressed("D") ) && ( keyboard.pressed("W") || keyboard.pressed("S") ) ) {
+
+		if ( engineY > 0 ) {
+			boat.engineBlock.rotation.y = THREE.Math.clamp( engineY - delta * 1.75, 0, maxEngineY );
+		} else {
+			boat.engineBlock.rotation.y = THREE.Math.clamp( engineY + delta * 1.75, - maxEngineY, 0 );
+		}
+	}
+
+
+
+	controls.update();	
 }
 
