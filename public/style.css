@@ -11,3 +11,7 @@
 	/*background: linear-gradient(#00AEFF, #FFFFFF, #FFFFFF,#FFFFFF);*/
 	background-color: #ffffff;
 }
+
+#music {
+	display: none;
+}

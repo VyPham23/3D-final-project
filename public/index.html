@@ -10,6 +10,27 @@
 
 	</head>	
 	<body>
-		<div id="canvas"></div>
+		<div id="canvas">
+			<audio id="music" controls loop>
+				<source src="seasong.mp3"/>
+			</audio>
+			<script>
+				const audioPlayer = document.getElementById('music');
+				let isAudioPlaying = false;
+				function toggleAudio() {
+					if (isAudioPlaying) {
+						// Pause the audio
+						audioPlayer.pause();
+					} else {
+						// Play the audio
+						audioPlayer.play();
+					}
+
+					// Toggle the audio state
+					isAudioPlaying = !isAudioPlaying;
+				}
+				document.addEventListener('click', toggleAudio);
+			</script>
+		</div>
 	</body>
 </html>
